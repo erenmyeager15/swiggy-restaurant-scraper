@@ -1,7 +1,7 @@
 {
   "cities": ["Bangalore"],
   "localities": [],
-  "cuisines": ["Chinese"],
+  "cuisines": [],
   "sortBy": "RELEVANCE",
   "scrapeMenuSummary": false,
   "maxResults": 10,
