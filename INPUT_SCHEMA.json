@@ -1,0 +1,72 @@
+{
+  "title": "Swiggy Restaurant Scraper Input",
+  "description": "Collect public restaurant listing data from Swiggy by city, locality, and cuisine.",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "cities": {
+      "title": "Cities",
+      "description": "Cities to scrape, for example Bangalore, Mumbai, Delhi, Pune, Hyderabad, Chennai, Kolkata, or Ahmedabad.",
+      "type": "array",
+      "editor": "stringList",
+      "default": ["Bangalore"],
+      "minItems": 1
+    },
+    "localities": {
+      "title": "Localities / Areas",
+      "description": "Optional areas within the city. Leave empty to search the city page.",
+      "type": "array",
+      "editor": "stringList",
+      "default": []
+    },
+    "cuisines": {
+      "title": "Cuisine filters",
+      "description": "Optional cuisine filters such as Chinese, North Indian, Italian, Biryani, or South Indian.",
+      "type": "array",
+      "editor": "stringList",
+      "default": []
+    },
+    "sortBy": {
+      "title": "Sort order",
+      "description": "Preferred result sorting when Swiggy exposes sorting controls.",
+      "type": "string",
+      "editor": "select",
+      "default": "RELEVANCE",
+      "enum": ["RELEVANCE", "RATING", "DELIVERY_TIME", "COST_LOW_TO_HIGH", "COST_HIGH_TO_LOW"],
+      "enumTitles": ["Relevance", "Rating", "Delivery Time", "Cost: Low to High", "Cost: High to Low"]
+    },
+    "scrapeMenuSummary": {
+      "title": "Scrape menu summary",
+      "description": "Optionally visit restaurant pages to extract menu category counts when visible. This increases runtime.",
+      "type": "boolean",
+      "editor": "checkbox",
+      "default": false
+    },
+    "maxResults": {
+      "title": "Maximum restaurants",
+      "description": "Maximum unique restaurant records to save across selected cities and filters.",
+      "type": "integer",
+      "editor": "number",
+      "minimum": 1,
+      "maximum": 300,
+      "default": 50
+    },
+    "proxyConfiguration": {
+      "title": "Proxy configuration",
+      "description": "India residential proxies are recommended for reliable regional access.",
+      "type": "object",
+      "editor": "proxy",
+      "default": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["RESIDENTIAL"],
+        "apifyProxyCountry": "IN"
+      },
+      "prefill": {
+        "useApifyProxy": true,
+        "apifyProxyGroups": ["RESIDENTIAL"],
+        "apifyProxyCountry": "IN"
+      }
+    }
+  },
+  "required": ["cities"]
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.git/
+.gitignore
+.apify/
+.apify_storage/
+storage/
+*.log
+.env
+.DS_Store
+input.json
+README.md
+LICENSE

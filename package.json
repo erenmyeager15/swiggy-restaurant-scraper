@@ -1,0 +1,24 @@
+{
+  "name": "swiggy-restaurant-scraper",
+  "version": "1.0.0",
+  "description": "Apify Actor to scrape public Swiggy restaurant listing data.",
+  "main": "dist/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node dist/main.js",
+    "build": "tsc",
+    "lint": "eslint src/ --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "apify": "^3.2.5",
+    "crawlee": "^3.11.0",
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "@apify/tsconfig": "^0.1.0",
+    "@types/node": "^20.17.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.0"
+  }
+}

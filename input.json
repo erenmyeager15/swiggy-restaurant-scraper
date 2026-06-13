@@ -1,0 +1,13 @@
+{
+  "cities": ["Bangalore"],
+  "localities": [],
+  "cuisines": ["Chinese"],
+  "sortBy": "RELEVANCE",
+  "scrapeMenuSummary": false,
+  "maxResults": 10,
+  "proxyConfiguration": {
+    "useApifyProxy": true,
+    "apifyProxyGroups": ["RESIDENTIAL"],
+    "apifyProxyCountry": "IN"
+  }
+}

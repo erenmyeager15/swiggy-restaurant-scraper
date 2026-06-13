@@ -1,0 +1,112 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "restaurants": {
+      "title": "Restaurants",
+      "transformation": {
+        "fields": [
+          "source",
+          "imageUrl",
+          "searchCity",
+          "searchLocality",
+          "searchCuisine",
+          "position",
+          "restaurantId",
+          "restaurantName",
+          "cuisineTypes",
+          "costForTwo",
+          "priceForTwo",
+          "overallRating",
+          "totalRatingsCount",
+          "deliveryTimeEstimate",
+          "distance",
+          "offersAndDiscounts",
+          "pureVeg",
+          "openClosedStatus",
+          "locality",
+          "city",
+          "promotedSponsored",
+          "restaurantUrl",
+          "scrapedAt"
+        ]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "source": {
+            "label": "Source"
+          },
+          "imageUrl": {
+            "label": "Image",
+            "format": "image"
+          },
+          "searchCity": {
+            "label": "Search City"
+          },
+          "searchLocality": {
+            "label": "Search Locality"
+          },
+          "searchCuisine": {
+            "label": "Cuisine Filter"
+          },
+          "position": {
+            "label": "Position"
+          },
+          "restaurantId": {
+            "label": "Restaurant ID"
+          },
+          "restaurantName": {
+            "label": "Restaurant"
+          },
+          "cuisineTypes": {
+            "label": "Cuisines"
+          },
+          "costForTwo": {
+            "label": "Cost for Two"
+          },
+          "priceForTwo": {
+            "label": "Price for Two"
+          },
+          "overallRating": {
+            "label": "Rating"
+          },
+          "totalRatingsCount": {
+            "label": "Ratings"
+          },
+          "deliveryTimeEstimate": {
+            "label": "Delivery Time"
+          },
+          "distance": {
+            "label": "Distance"
+          },
+          "offersAndDiscounts": {
+            "label": "Offers"
+          },
+          "pureVeg": {
+            "label": "Pure Veg"
+          },
+          "openClosedStatus": {
+            "label": "Open"
+          },
+          "locality": {
+            "label": "Locality"
+          },
+          "city": {
+            "label": "City"
+          },
+          "promotedSponsored": {
+            "label": "Sponsored"
+          },
+          "restaurantUrl": {
+            "label": "URL",
+            "format": "link"
+          },
+          "scrapedAt": {
+            "label": "Scraped At",
+            "format": "date"
+          }
+        }
+      }
+    }
+  }
+}
