@@ -2,7 +2,7 @@
 
 Scrape public Swiggy restaurant listing data by city, locality, and cuisine. This Actor collects restaurant names, cuisine types, ratings, rating counts, cost for two, delivery time, distance, visible offers, vegetarian status, locality, image URLs, and Swiggy restaurant URLs.
 
-It is designed for food delivery research, restaurant market analysis, competitor monitoring, pricing intelligence, and local restaurant discovery datasets. The scraper uses Playwright, Crawlee, residential proxy support, session rotation, retries, and random waits for stable public-page collection.
+It is designed for food delivery research, restaurant market analysis, competitor monitoring, pricing intelligence, and local restaurant discovery datasets. The scraper uses Swiggy's public web JSON responses with optional Apify Proxy routing, retries, and random waits for stable public listing collection.
 
 This Actor extracts public business listing facts only. It does not collect phone numbers, emails, customer data, private account data, or personal profiles.
 
@@ -22,7 +22,6 @@ This Actor extracts public business listing facts only. It does not collect phon
   "localities": [],
   "cuisines": ["Chinese"],
   "sortBy": "RELEVANCE",
-  "scrapeMenuSummary": false,
   "maxResults": 10,
   "proxyConfiguration": {
     "useApifyProxy": true,
@@ -83,11 +82,12 @@ The Actor charges only after a restaurant record is successfully saved.
 - Swiggy pages can vary by city, locality, and region.
 - Some fields may be `null` when Swiggy does not show them on the listing page.
 - India residential proxies are recommended for reliable regional access.
-- Optional menu summary scraping increases runtime and may not be available for every restaurant.
 
 ## Responsible Use
 
-Use this Actor only for lawful purposes and in compliance with Swiggy's terms, robots.txt, applicable privacy laws, and local regulations. Do not use it to collect, store, or resell personal data without a lawful basis. This Actor is intended for public restaurant listing research and market analytics.
+This Actor is intended for lawful collection of publicly available information only. Users are responsible for ensuring their use complies with the source website's terms, robots.txt, applicable privacy laws, including India's DPDP Act, and all local regulations.
+
+Do not use this Actor to collect, store, sell, or misuse personal data without a lawful basis. The Actor author is not responsible for misuse by end users.
 
 ## License
 

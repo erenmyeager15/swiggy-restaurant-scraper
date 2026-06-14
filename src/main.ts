@@ -1,4 +1,5 @@
 import { Actor, log } from 'apify';
+import { ProxyAgent, fetch as undiciFetch } from 'undici';
 import type { ActorInput, RestaurantRecord, SwiggyRestaurantInfo } from './types.js';
 
 const CITY_COORDS: Record<string, { lat: number; lng: number; label: string }> = {
@@ -31,6 +32,10 @@ const SORT_MAP: Record<string, string> = {
 function normalizeText(value: unknown): string | null {
   const text = String(value ?? '').replace(/\s+/g, ' ').trim();
   return text || null;
+}
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function cityKey(city: string): string {
@@ -128,23 +133,37 @@ function buildListUrl(city: string, offset: string | null, sortBy: string | unde
   return url.toString();
 }
 
-async function fetchSwiggyJson(url: string, proxyUrl?: string): Promise<Record<string, unknown>> {
-  const response = await fetch(url, {
-    headers: {
-      'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
-      accept: 'application/json',
-      referer: 'https://www.swiggy.com/',
-      'accept-language': 'en-IN,en;q=0.9',
-    },
-    // Native fetch ignores proxyUrl; Apify proxy is handled by browser actors more easily.
-    // The public API usually works directly, so proxy fallback is intentionally not forced here.
-  });
+async function fetchSwiggyJson(
+  url: string,
+  proxyConfiguration?: { newUrl: () => string | undefined | Promise<string | undefined> },
+): Promise<Record<string, unknown>> {
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
-    throw new Error(`Swiggy API returned ${response.status} for ${url}${proxyUrl ? ' using proxy' : ''}`);
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const proxyUrl = proxyConfiguration ? await proxyConfiguration.newUrl() : undefined;
+    const dispatcher = proxyUrl ? new ProxyAgent(proxyUrl) : undefined;
+
+    try {
+      const response = await undiciFetch(url, {
+        headers: {
+          'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+          accept: 'application/json',
+          referer: 'https://www.swiggy.com/',
+          'accept-language': 'en-IN,en;q=0.9',
+        },
+        dispatcher,
+      });
+
+      if (response.ok) return response.json() as Promise<Record<string, unknown>>;
+      lastError = new Error(`Swiggy API returned ${response.status} for ${url}`);
+    } catch (error) {
+      lastError = error as Error;
+    }
+
+    if (attempt < 3) await delay(1000 * attempt + Math.floor(Math.random() * 750));
   }
 
-  return response.json() as Promise<Record<string, unknown>>;
+  throw lastError ?? new Error(`Swiggy API request failed for ${url}`);
 }
 
 function toRecord(info: SwiggyRestaurantInfo, input: Required<Pick<ActorInput, 'cuisines'>>, city: string, locality: string | null, position: number): RestaurantRecord {
@@ -186,7 +205,6 @@ function normalizeInput(input: ActorInput | null): Required<ActorInput> {
     localities: input?.localities ?? [],
     cuisines: input?.cuisines ?? [],
     sortBy: input?.sortBy ?? 'RELEVANCE',
-    scrapeMenuSummary: input?.scrapeMenuSummary ?? false,
     maxResults: Math.min(Math.max(input?.maxResults ?? 50, 1), 300),
     proxyConfiguration: input?.proxyConfiguration ?? { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'], apifyProxyCountry: 'IN' },
   };
@@ -196,6 +214,9 @@ await Actor.init();
 
 try {
   const input = normalizeInput(await Actor.getInput<ActorInput>());
+  const proxyConfiguration = input.proxyConfiguration.useApifyProxy
+    ? await Actor.createProxyConfiguration(input.proxyConfiguration)
+    : undefined;
   const seen = new Set<string>();
   let savedCount = 0;
 
@@ -216,7 +237,7 @@ try {
       for (let page = 0; page < 8 && savedCount < input.maxResults; page += 1) {
         const url = buildListUrl(city, offset, input.sortBy);
         log.info('Fetching Swiggy restaurant page', { city, locality, page: page + 1 });
-        const json = await fetchSwiggyJson(url);
+        const json = await fetchSwiggyJson(url, proxyConfiguration);
 
         const restaurants: SwiggyRestaurantInfo[] = [];
         collectRestaurants(json, restaurants, new Set<string>());
@@ -241,7 +262,7 @@ try {
         const nextOffset = normalizeText(data?.pageOffset?.nextOffset);
         if (!nextOffset || nextOffset === offset) break;
         offset = nextOffset;
-        await new Promise((resolve) => setTimeout(resolve, 1000 + Math.floor(Math.random() * 1500)));
+        await delay(1000 + Math.floor(Math.random() * 1500));
       }
     }
   }

@@ -7,7 +7,7 @@
   "dockerfile": "Dockerfile",
   "input": "../INPUT_SCHEMA.json",
   "readme": "../README.md",
-  "categories": ["E_COMMERCE", "OTHER"],
+  "categories": ["ECOMMERCE", "OTHER"],
   "pricingInfo": {
     "pricingModel": "PAY_PER_EVENT",
     "pricingPerEvent": {

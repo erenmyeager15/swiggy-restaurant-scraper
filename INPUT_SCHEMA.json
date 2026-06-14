@@ -35,13 +35,6 @@
       "enum": ["RELEVANCE", "RATING", "DELIVERY_TIME", "COST_LOW_TO_HIGH", "COST_HIGH_TO_LOW"],
       "enumTitles": ["Relevance", "Rating", "Delivery Time", "Cost: Low to High", "Cost: High to Low"]
     },
-    "scrapeMenuSummary": {
-      "title": "Scrape menu summary",
-      "description": "Optionally visit restaurant pages to extract menu category counts when visible. This increases runtime.",
-      "type": "boolean",
-      "editor": "checkbox",
-      "default": false
-    },
     "maxResults": {
       "title": "Maximum restaurants",
       "description": "Maximum unique restaurant records to save across selected cities and filters.",

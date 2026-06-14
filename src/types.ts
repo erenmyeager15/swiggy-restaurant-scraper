@@ -3,7 +3,6 @@ export interface ActorInput {
   localities?: string[];
   cuisines?: string[];
   sortBy?: 'RELEVANCE' | 'RATING' | 'DELIVERY_TIME' | 'COST_LOW_TO_HIGH' | 'COST_HIGH_TO_LOW';
-  scrapeMenuSummary?: boolean;
   maxResults?: number;
   proxyConfiguration?: {
     useApifyProxy?: boolean;
