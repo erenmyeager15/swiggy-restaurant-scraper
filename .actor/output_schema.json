@@ -1,0 +1,14 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Swiggy Restaurant Scraper Output",
+  "description": "Structured Swiggy restaurant records with names, cuisines, ratings, delivery time, distance, cost for two, offers, locality, city, sponsored status, image URLs, restaurant URLs, and scraped timestamps.",
+  "type": "object",
+  "properties": {
+    "results": {
+      "type": "string",
+      "title": "Swiggy restaurant records",
+      "description": "Clean dataset items containing public Swiggy restaurant listing, delivery, pricing, rating, offer, location, and URL data.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items"
+    }
+  }
+}

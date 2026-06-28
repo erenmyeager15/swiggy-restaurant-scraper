@@ -1,12 +1,12 @@
 {
   "title": "Swiggy Restaurant Scraper Input",
-  "description": "Collect public restaurant listing data from Swiggy by city, locality, and cuisine.",
+  "description": "Collect public restaurant listing data from Swiggy by city, locality, and cuisine. For a low-cost test, use one city, one cuisine, maxResults 5, and India residential proxy.",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
     "cities": {
       "title": "Cities",
-      "description": "Cities to scrape, for example Bangalore, Mumbai, Delhi, Pune, Hyderabad, Chennai, Kolkata, or Ahmedabad.",
+      "description": "Cities to scrape, for example Bangalore, Mumbai, Delhi, Pune, Hyderabad, Chennai, Kolkata, or Ahmedabad. Start with one city for tests.",
       "type": "array",
       "editor": "stringList",
       "default": ["Bangalore"],
@@ -14,17 +14,17 @@
     },
     "localities": {
       "title": "Localities / Areas",
-      "description": "Optional areas within the city. Leave empty to search the city page.",
+      "description": "Optional areas within the city. Leave empty to search the city page for a lower-cost test.",
       "type": "array",
       "editor": "stringList",
       "default": []
     },
     "cuisines": {
       "title": "Cuisine filters",
-      "description": "Optional cuisine filters such as Chinese, North Indian, Italian, Biryani, or South Indian.",
+      "description": "Optional cuisine filters such as pizza, Chinese, North Indian, Italian, Biryani, or South Indian. Start with one cuisine for tests.",
       "type": "array",
       "editor": "stringList",
-      "default": []
+      "default": ["pizza"]
     },
     "sortBy": {
       "title": "Sort order",
@@ -32,21 +32,33 @@
       "type": "string",
       "editor": "select",
       "default": "RELEVANCE",
-      "enum": ["RELEVANCE", "RATING", "DELIVERY_TIME", "COST_LOW_TO_HIGH", "COST_HIGH_TO_LOW"],
-      "enumTitles": ["Relevance", "Rating", "Delivery Time", "Cost: Low to High", "Cost: High to Low"]
+      "enum": [
+        "RELEVANCE",
+        "RATING",
+        "DELIVERY_TIME",
+        "COST_LOW_TO_HIGH",
+        "COST_HIGH_TO_LOW"
+      ],
+      "enumTitles": [
+        "Relevance",
+        "Rating",
+        "Delivery Time",
+        "Cost: Low to High",
+        "Cost: High to Low"
+      ]
     },
     "maxResults": {
       "title": "Maximum restaurants",
-      "description": "Maximum unique restaurant records to save across selected cities and filters.",
+      "description": "Maximum unique restaurant records to save across selected cities and filters. Use 5-10 for test runs.",
       "type": "integer",
       "editor": "number",
       "minimum": 1,
       "maximum": 300,
-      "default": 50
+      "default": 5
     },
     "proxyConfiguration": {
       "title": "Proxy configuration",
-      "description": "India residential proxies are recommended for reliable regional access.",
+      "description": "India residential proxies are recommended for reliable regional access and are billed as platform usage.",
       "type": "object",
       "editor": "proxy",
       "default": {

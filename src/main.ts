@@ -44,7 +44,15 @@ function cityKey(city: string): string {
 
 function getCityLocation(city: string): { lat: number; lng: number; label: string } {
   const key = cityKey(city);
-  return CITY_COORDS[key] ?? { lat: 12.9715987, lng: 77.5945627, label: city.trim() || 'Bangalore' };
+  const location = CITY_COORDS[key];
+  if (!location) {
+    const supportedCities = Object.values(CITY_COORDS)
+      .map((entry) => entry.label)
+      .filter((label, index, labels) => labels.indexOf(label) === index)
+      .join(', ');
+    throw new Error(`Unsupported Swiggy city "${city}". Use one of: ${supportedCities}.`);
+  }
+  return location;
 }
 
 function parseCount(value: unknown): number | null {
@@ -118,6 +126,18 @@ function matchesCuisine(info: SwiggyRestaurantInfo, cuisines: string[]): boolean
   if (!cuisines.length) return true;
   const haystack = [info.name, ...(info.cuisines ?? [])].join(' ').toLowerCase();
   return cuisines.some((cuisine) => haystack.includes(cuisine.toLowerCase()));
+}
+
+function matchesLocality(info: SwiggyRestaurantInfo, locality: string | null): boolean {
+  const target = normalizeText(locality);
+  if (!target) return true;
+  const normalizedTarget = cityKey(target);
+  const haystack = [info.locality, info.areaName, info.slug, info.name]
+    .map((value) => normalizeText(value))
+    .filter(Boolean)
+    .map((value) => cityKey(value as string))
+    .join(' ');
+  return haystack.includes(normalizedTarget);
 }
 
 function buildListUrl(city: string, offset: string | null, sortBy: string | undefined): string {
@@ -203,9 +223,9 @@ function normalizeInput(input: ActorInput | null): Required<ActorInput> {
   return {
     cities: cities.length ? cities : ['Bangalore'],
     localities: input?.localities ?? [],
-    cuisines: input?.cuisines ?? [],
-    sortBy: input?.sortBy ?? 'RELEVANCE',
-    maxResults: Math.min(Math.max(input?.maxResults ?? 50, 1), 300),
+        cuisines: input?.cuisines ?? ['pizza'],
+        sortBy: input?.sortBy ?? 'RELEVANCE',
+        maxResults: Math.min(Math.max(input?.maxResults ?? 5, 1), 300),
     proxyConfiguration: input?.proxyConfiguration ?? { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'], apifyProxyCountry: 'IN' },
   };
 }
@@ -219,6 +239,8 @@ try {
     : undefined;
   const seen = new Set<string>();
   let savedCount = 0;
+  let spendingLimitReached = false;
+  let fatalBillingError: Error | null = null;
 
   log.info('Starting Swiggy API scrape', {
     cities: input.cities,
@@ -227,14 +249,14 @@ try {
   });
 
   for (const city of input.cities) {
-    if (savedCount >= input.maxResults) break;
+    if (savedCount >= input.maxResults || spendingLimitReached || fatalBillingError) break;
     const localities = input.localities.length ? input.localities : [null];
 
     for (const locality of localities) {
-      if (savedCount >= input.maxResults) break;
+      if (savedCount >= input.maxResults || spendingLimitReached || fatalBillingError) break;
       let offset: string | null = null;
 
-      for (let page = 0; page < 8 && savedCount < input.maxResults; page += 1) {
+      for (let page = 0; page < 8 && savedCount < input.maxResults && !spendingLimitReached && !fatalBillingError; page += 1) {
         const url = buildListUrl(city, offset, input.sortBy);
         log.info('Fetching Swiggy restaurant page', { city, locality, page: page + 1 });
         const json = await fetchSwiggyJson(url, proxyConfiguration);
@@ -246,16 +268,38 @@ try {
         for (const info of restaurants) {
           if (savedCount >= input.maxResults) break;
           if (!matchesCuisine(info, input.cuisines)) continue;
+          if (!matchesLocality(info, locality)) continue;
           const id = String(info.id);
           if (seen.has(id)) continue;
-          seen.add(id);
 
           const record = toRecord(info, input, city, locality, savedCount + 1);
           if (!record.restaurantName || !record.restaurantUrl) continue;
 
-          await Actor.pushData(record);
-          await Actor.charge({ eventName: 'restaurant-scraped' });
-          savedCount += 1;
+          try {
+            const chargeResult = await Actor.pushData(record, 'restaurant-scraped');
+            const recordWasSaved = chargeResult.chargedCount > 0
+              || !chargeResult.eventChargeLimitReached;
+
+            if (recordWasSaved) {
+              seen.add(id);
+              savedCount += 1;
+            }
+
+            if (chargeResult.eventChargeLimitReached) {
+              spendingLimitReached = true;
+              await Actor.setStatusMessage(`Stopped at the user's spending limit after ${savedCount} restaurants`);
+              log.info('User spending limit reached; stopping before more Swiggy pages are requested.');
+              break;
+            }
+          } catch (error) {
+            fatalBillingError = error instanceof Error ? error : new Error(String(error));
+            spendingLimitReached = true;
+            await Actor.setStatusMessage('Stopped because restaurant output billing failed.');
+            log.error('Stopping Swiggy run because dataset push with restaurant-scraped charge failed.', {
+              error: fatalBillingError.message,
+            });
+            throw fatalBillingError;
+          }
         }
 
         const data = json.data as { pageOffset?: { nextOffset?: string } } | undefined;
@@ -265,6 +309,11 @@ try {
         await delay(1000 + Math.floor(Math.random() * 1500));
       }
     }
+  }
+
+  if (fatalBillingError) throw fatalBillingError;
+  if (savedCount === 0 && !spendingLimitReached) {
+    throw new Error('Swiggy scrape finished with no saved restaurants.');
   }
 
   log.info('Swiggy scrape finished', { savedCount });
