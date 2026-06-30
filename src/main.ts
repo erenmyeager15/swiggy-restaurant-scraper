@@ -1,5 +1,7 @@
 import { Actor, log } from 'apify';
 import { ProxyAgent, fetch as undiciFetch } from 'undici';
+import { wasPushedRecordSaved } from './billing.js';
+import { normalizeInput } from './input.js';
 import type { ActorInput, RestaurantRecord, SwiggyRestaurantInfo } from './types.js';
 
 const CITY_COORDS: Record<string, { lat: number; lng: number; label: string }> = {
@@ -218,18 +220,6 @@ function toRecord(info: SwiggyRestaurantInfo, input: Required<Pick<ActorInput, '
   };
 }
 
-function normalizeInput(input: ActorInput | null): Required<ActorInput> {
-  const cities = input?.cities?.length ? input.cities.map((city) => city.trim()).filter(Boolean) : ['Bangalore'];
-  return {
-    cities: cities.length ? cities : ['Bangalore'],
-    localities: input?.localities ?? [],
-        cuisines: input?.cuisines ?? ['pizza'],
-        sortBy: input?.sortBy ?? 'RELEVANCE',
-        maxResults: Math.min(Math.max(input?.maxResults ?? 5, 1), 300),
-    proxyConfiguration: input?.proxyConfiguration ?? { useApifyProxy: true, apifyProxyGroups: ['RESIDENTIAL'], apifyProxyCountry: 'IN' },
-  };
-}
-
 await Actor.init();
 
 try {
@@ -277,8 +267,7 @@ try {
 
           try {
             const chargeResult = await Actor.pushData(record, 'restaurant-scraped');
-            const recordWasSaved = chargeResult.chargedCount > 0
-              || !chargeResult.eventChargeLimitReached;
+            const recordWasSaved = wasPushedRecordSaved(chargeResult);
 
             if (recordWasSaved) {
               seen.add(id);

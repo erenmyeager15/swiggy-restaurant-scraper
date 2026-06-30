@@ -7,8 +7,12 @@
   "scripts": {
     "start": "node dist/main.js",
     "build": "tsc",
-    "lint": "eslint src/ --ext .ts",
-    "typecheck": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test dist/input.test.js dist/billing.test.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "apify": "^3.2.5",

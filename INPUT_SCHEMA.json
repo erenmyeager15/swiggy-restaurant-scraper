@@ -1,6 +1,6 @@
 {
   "title": "Swiggy Restaurant Scraper Input",
-  "description": "Collect public restaurant listing data from Swiggy by city, locality, and cuisine. For a low-cost test, use one city, one cuisine, maxResults 5, and India residential proxy.",
+  "description": "Collect public restaurant listing data from Swiggy by city, locality, and cuisine. For a low-cost first run, use one city, one cuisine, maxResults 1, and the recommended India residential proxy.",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
@@ -49,12 +49,12 @@
     },
     "maxResults": {
       "title": "Maximum restaurants",
-      "description": "Maximum unique restaurant records to save across selected cities and filters. Use 5-10 for test runs.",
+      "description": "Maximum unique restaurant records to save across selected cities and filters. Start with 1, inspect the output, and then scale up.",
       "type": "integer",
       "editor": "number",
       "minimum": 1,
       "maximum": 300,
-      "default": 5
+      "default": 1
     },
     "proxyConfiguration": {
       "title": "Proxy configuration",

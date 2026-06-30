@@ -4,19 +4,25 @@
   "title": "Swiggy Restaurant Scraper - Listings, Ratings & Delivery Data",
   "description": "Scrape public Swiggy restaurant listings with names, cuisines, ratings, delivery time, cost for two, offers, locality, image URLs, and restaurant URLs.",
   "version": "1.0",
+  "buildTag": "latest",
   "dockerfile": "Dockerfile",
   "input": "../INPUT_SCHEMA.json",
   "readme": "../README.md",
   "output": "./output_schema.json",
-  "categories": ["ECOMMERCE", "OTHER"],
+  "categories": ["OTHER", "ECOMMERCE"],
+  "categoriesVersion": "1.0.0",
+  "exampleRunInput": {
+    "body": "{\"cities\":[\"Bangalore\"],\"localities\":[],\"cuisines\":[\"pizza\"],\"sortBy\":\"RELEVANCE\",\"maxResults\":1,\"proxyConfiguration\":{\"useApifyProxy\":true,\"apifyProxyGroups\":[\"RESIDENTIAL\"],\"apifyProxyCountry\":\"IN\"}}",
+    "contentType": "application/json"
+  },
   "pricingInfo": {
     "pricingModel": "PAY_PER_EVENT",
     "pricingPerEvent": {
       "actorChargeEvents": {
         "apify-actor-start": {
-          "eventTitle": "Actor start",
-          "eventDescription": "Charged when the run starts to cover browser startup and the residential proxy session. Number of events depends on memory (one per GB, minimum one).",
-          "eventPriceUsd": 0.001,
+          "eventTitle": "Actor Start",
+          "eventDescription": "Charged when the Actor starts. Number of events depends on memory (one per GB, minimum one).",
+          "eventPriceUsd": 0.00005,
           "isPrimaryEvent": false,
           "isOneTimeEvent": true
         },
@@ -35,7 +41,9 @@
   },
   "defaultRunOptions": {
     "build": "latest",
-    "memoryMbytes": 2048,
+    "memoryMbytes": 4096,
     "timeoutSecs": 3600
-  }
+  },
+  "minMemoryMbytes": 4096,
+  "maxMemoryMbytes": 4096
 }
