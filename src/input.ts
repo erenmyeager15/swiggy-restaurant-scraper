@@ -20,10 +20,19 @@ const DEFAULT_PROXY = {
 };
 
 function cleanList(values: string[] | undefined): string[] {
-  return (values ?? []).map((value) => value.trim()).filter(Boolean);
+  if (values !== undefined && (!Array.isArray(values) || values.some((value) => typeof value !== 'string'))) {
+    throw new Error('Search fields must be arrays of strings.');
+  }
+  return [...new Set((values ?? []).map((value) => value.trim()).filter(Boolean))];
 }
 
 export function normalizeInput(input: ActorInput | null): NormalizedActorInput {
+  if (input?.maxResults !== undefined && (!Number.isInteger(input.maxResults) || input.maxResults < 1)) {
+    throw new Error('maxResults must be a positive integer.');
+  }
+  if (input?.sortBy !== undefined && !['RELEVANCE', 'RATING', 'DELIVERY_TIME', 'COST_LOW_TO_HIGH', 'COST_HIGH_TO_LOW'].includes(input.sortBy)) {
+    throw new Error('Unsupported sortBy.');
+  }
   const cities = cleanList(input?.cities);
   const cuisines = input?.cuisines === undefined ? ['pizza'] : cleanList(input.cuisines);
 

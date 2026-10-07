@@ -105,6 +105,12 @@ Tiny test input:
 
 ## Notes
 
+- The configured default is 256 MB for the HTTP-only collector (previously 4096 MB). Explicit higher-memory runs remain supported. Local regression checks are not proof of cloud memory usage or profit; validate representative cloud runs before relying on this setting at scale.
+
+- Each row includes `searchCoordinates`, `locationMethod`, `localityFilterMode`, `currency`, and the source's `deliveryTimeText`. Searches use a fixed city-center coordinate. A locality is a text filter, not a selected delivery address or proof of serviceability.
+- Unknown vegetarian/open status is `null`, not `false`. Cost for two is a listing estimate, not a checkout total.
+- The run's `OUTPUT` key reports pages fetched, saved rows and stop reasons. Pagination is bounded to eight pages per city and checks for repeated pages/offsets; this is not exhaustive city coverage.
+
 - Swiggy pages can vary by city, locality, and region.
 - Some fields may be `null` when Swiggy does not show them on the listing page.
 - India residential proxies are recommended for reliable regional access.

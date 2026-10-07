@@ -54,6 +54,11 @@ export interface RestaurantRecord {
   source: 'swiggy';
   imageUrl: string | null;
   searchCity: string;
+  searchCoordinates: { latitude: number; longitude: number };
+  locationMethod: 'city_center';
+  localityFilterMode: 'text_match_not_delivery_location';
+  currency: 'INR';
+  deliveryTimeText: string | null;
   searchLocality: string | null;
   searchCuisine: string | null;
   position: number;
@@ -67,8 +72,8 @@ export interface RestaurantRecord {
   deliveryTimeEstimate: number | null;
   distance: string | null;
   offersAndDiscounts: string[];
-  pureVeg: boolean;
-  openClosedStatus: boolean;
+  pureVeg: boolean | null;
+  openClosedStatus: boolean | null;
   restaurantUrl: string;
   locality: string | null;
   city: string;
